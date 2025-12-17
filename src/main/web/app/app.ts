@@ -334,11 +334,12 @@ export class MainAppComponent extends Component<
       const header = this.state.headerHTML.get() as ReactElement<any>;
       // to make sure that page layout can adapt to header of any height we duplicate the header's
       // dom element and re-insert it as a hidden element with relative position.
-      const hiddenHeader = cloneElement(header, {
-        style: { visibility: 'hidden', position: 'relative' },
-        key: 'hidden-header',
-      });
-      return [header, hiddenHeader];
+      //const hiddenHeader = cloneElement(header, {
+      //  style: { visibility: 'hidden', position: 'relative' },
+      //  key: 'hidden-header',
+      //});
+      //return [header, hiddenHeader];
+      return [header];
     }
   }
 }
@@ -354,19 +355,18 @@ listen({
 
 window.addEventListener('DOMContentLoaded', function () {
   Kefir.combine({
-    url: initNavigation(),
     prefixes: getRegisteredPrefixes(),
     rawConfig: ConfigHolder.fetchConfig(),
     repositories: DefaultRepositoryInfo.init(),
   })
-    .flatMap(({ url, prefixes, rawConfig }) => {
+    .flatMap(({ prefixes, rawConfig }) => {
       try {
         SparqlUtil.init(prefixes);
         ConfigHolder.initializeConfig(rawConfig);
+        return initNavigation().map((url) => ({ url, prefixes, rawConfig }));
       } catch (e) {
         return Kefir.constantError<any>(e);
       }
-      return Kefir.constant(url);
     })
     .flatMap(() => {
       return initResourceConfig();

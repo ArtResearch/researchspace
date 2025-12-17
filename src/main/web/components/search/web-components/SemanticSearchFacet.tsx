@@ -75,7 +75,8 @@ class SemanticSearchFacetInner extends React.Component<InnerProps, State> {
     super(props);
     this.state = {
       facetData: null,
-      showFacets: props.openByDefault,
+      // on mobile devices we hide facets by default
+      showFacets: window.innerWidth <= 600 ? false : props.openByDefault,
       bigResultSet: false,
     };
   }
@@ -110,7 +111,9 @@ class SemanticSearchFacetInner extends React.Component<InnerProps, State> {
       .map(({ currentDomain, newDomain }) => !currentDomain.iri.equals(newDomain.iri))
       .getOrElse(false);
 
-    if ((!this.facetStore && canUpdateFacets) || isNewDomain) {
+    const isNewAlignment = !context.selectedAlignment.isEqual(nextContext.selectedAlignment);
+
+    if ((!this.facetStore && canUpdateFacets) || isNewDomain || isNewAlignment) {
       this.createFacetStore(nextContext.baseQuery.get(), nextContext);
     } else if (canUpdateFacets) {
       this.facetStore.facetActions().setBaseQuery(nextContext.baseQuery.get());

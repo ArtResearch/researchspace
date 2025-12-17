@@ -58,27 +58,29 @@ export function breakGraphCycles<T extends { children: Set<T> }>(graph: T[]) {
  * Remove redundant edges from directed acyclic graph
  * (so reachablility would be the same), should be O(N(N + E)).
  */
-export function transitiveReduction<T extends { children: Set<T> }>(graph: T[]) {
+export function transitiveReduction<T extends { children: Set<T>; iri?: { value: string } }>(graph: T[]) {
   const edgesToRemove: Array<[T, T]> = [];
-  const visited = new Set<T>();
-
-  function searchForRedundantEdges(parent: T, currentChild: T) {
-    visited.add(currentChild);
-    currentChild.children.forEach((grandChild) => {
-      if (visited.has(grandChild)) {
-        return;
-      }
-      if (parent.children.has(grandChild)) {
-        edgesToRemove.push([parent, grandChild]);
-      }
-      searchForRedundantEdges(parent, grandChild);
-    });
-  }
 
   for (const node of graph) {
     node.children.forEach((child) => {
-      visited.clear();
-      searchForRedundantEdges(node, child);
+      const visited = new Set<T>();
+      const stack = [child];
+      visited.add(child);
+
+      while (stack.length > 0) {
+        const current = stack.pop();
+        if (current) {
+          current.children.forEach((grandChild) => {
+            if (!visited.has(grandChild)) {
+              visited.add(grandChild);
+              stack.push(grandChild);
+              if (node.children.has(grandChild)) {
+                edgesToRemove.push([node, grandChild]);
+              }
+            }
+          });
+        }
+      }
     });
   }
 

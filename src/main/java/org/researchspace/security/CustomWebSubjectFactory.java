@@ -40,7 +40,6 @@ public class CustomWebSubjectFactory extends Pac4jSubjectFactory {
                 wsc.setSessionCreationEnabled(false);
             }
         }
-
         return super.createSubject(context);
     }
 }

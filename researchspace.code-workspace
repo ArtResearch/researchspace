@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../artresearch.net"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"typescript.format.enable": false,
+		"java.configuration.updateBuildConfiguration": "interactive",
+		"java.debug.settings.vmArgs": "--add-opens java.base/java.lang=ALL-UNNAMED",
+		"java.compile.nullAnalysis.mode": "disabled"
+	}
+}

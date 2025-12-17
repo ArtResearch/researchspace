@@ -46,6 +46,7 @@ public class HandlebarsHelperRegistry {
                 new FieldDefinitionSource(repositoryManager, fieldDefinitionManager, fieldsBasedSearch, labelCache),
                 new PrefixResolverHelperSource(), new SetManagementHelperSource(),
                 new IsRepositoryTypeHelperSource(repositoryManager), new UriComponentHelperSource(),
+                new JsonHelperSource(),
                 new DateTimeHelperSource());
     }
 

@@ -23,6 +23,7 @@ import * as Maybe from 'data.maybe';
 import { LightwightTreePatterns, ComplexTreePatterns } from 'platform/components/semantic/lazy-tree';
 import { Rdf } from 'platform/api/rdf';
 import * as _ from 'lodash';
+import { KeywordSearchConfig } from 'platform/components/shared/KeywordSearchConfig';
 
 export const RELATION_PROFILE_VARIABLES = {
   CATEGORY_PROJECTION_VAR: 'category',
@@ -433,6 +434,16 @@ export interface SemanticSearchConfig {
    * Applied when no saved facet state is present.
    */
   presetFacets?: Array<PresetFacetValueConfig>;
+  
+  /**
+   * If true adds current search state as semanticSearch URL query paramter
+   * to the current page URL. And updates it every time search is updated.
+   * 
+   * Should be enabled if one requires back browser button to restore previous search state.
+   * 
+   * @default false
+   */
+  saveStateInBrowserHistory?: boolean;
 }
 
 /**
@@ -533,9 +544,12 @@ export interface Hierarchy {
    * @default `$subject ?__relation__ ?__value__ .`
    */
   queryPattern: string;
+  childrenPattern: string;
+  parentsPattern: string;
+  searchPattern: string;
 }
 
-export interface Text {
+export interface Text extends KeywordSearchConfig {
   kind: 'text';
 
   /**
@@ -553,22 +567,6 @@ export interface Text {
    *
    */
   helpPage?: string;
-
-  /**
-   * A flag determining whether any special Lucene syntax will be escaped.
-   * When `false` lucene syntax in the user input is not escaped.
-   *
-   * @default true
-   */
-  escapeLuceneSyntax?: boolean;
-
-  /**
-   * A flag determining whether the user input is tokenized by whitespace into words postfixed by `*`.
-   * E.g. the search for `Hello World` becomes `Hello* World*`.
-   *
-   * @default true
-   */
-  tokenizeLuceneQuery?: boolean;
 }
 
 export interface Place {
@@ -839,7 +837,7 @@ export interface SemanticFacetConfig {
 export interface FacetValuePatterns {
   [iri: string]: FacetValuePattern;
 }
-export type FacetValuePattern = ResourceFacetValue | DateRangeFacetValue | LiteralFacetValue | NumericRangeFacetValue;
+export type FacetValuePattern = ResourceFacetValue | DateRangeFacetValue | LiteralFacetValue | NumericRangeFacetValue | HierarchyFacetValue;
 
 export const FACET_VARIABLES = {
   RELATION_VAR: '__relation__',
@@ -850,6 +848,7 @@ export const FACET_VARIABLES = {
   VALUE_RESOURCE_LABEL_VAR: 'label',
   VALUE_DATE_RANGE_BEGIN_VAR: 'dateBeginValue',
   VALUE_DATE_RANGE_END_VAR: 'dateEndValue',
+  VALUE_DATE_RANGE_COUNT_VAR: 'count',
   VALUE_LITERAL: 'literal',
   VALUE_NUMERIC_RANGE_BEGIN_VAR: 'numericRangeBeginValue',
   VALUE_NUMERIC_RANGE_END_VAR: 'numericRangeEndValue',
@@ -892,6 +891,16 @@ export interface LiteralFacetValue {
 export interface NumericRangeFacetValue {
   kind: 'numeric-range';
   valuesQuery: string;
+}
+
+export interface HierarchyFacetValue {
+  kind: 'hierarchy';
+  queryPattern?: string;
+  childrenPattern?: string;
+  parentsPattern?: string;
+  searchPattern?: string;
+  tupleTemplate?: string;
+  valuesQuery?: string;
 }
 
 export interface FacetCategoryConfig {

@@ -193,6 +193,7 @@ export type DateValue = moment.Moment;
 export interface DateRange {
   readonly begin: DateValue;
   readonly end: DateValue;
+  readonly count?: number; // optional count of items in the range
 }
 export interface DateDeviation {
   readonly date: DateValue;
@@ -233,6 +234,7 @@ export interface Literal {
 export interface NumericRange {
   readonly begin: number;
   readonly end: number;
+  readonly count?: number; // optional count of items in the range
 }
 
 interface AbstractDisjunct<T> {

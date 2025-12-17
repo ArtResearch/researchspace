@@ -53,6 +53,7 @@ export interface FacetBreadcrumbsProps {
     selectCategory: (category: Category) => void;
     selectRelation: (relation: Relation) => void;
     removeConjunct: (relation: FacetRelationConjunct) => void;
+    removeAllConjuncts: () => void;
   };
 }
 
@@ -66,7 +67,17 @@ export class FacetBreadcrumbsComponent extends Component<FacetBreadcrumbsProps, 
 
     return (
       <div className={styles.breadcrumbs}>
-        <div className={styles.container}>{conjuncts.map(this.breadcrumb)}</div>
+        <div className={styles.container}>
+          <div className={styles.conjunct}>
+            <button
+              className={classNames(styles.cancelButton, 'btn', styles.clearAllButton)}
+              onClick={() => this.props.actions.removeAllConjuncts()}
+            >
+              Clear All <Icon iconType='rounded' iconName='delete' symbol />
+            </button>
+          </div>
+          {conjuncts.map(this.breadcrumb)}
+        </div>
       </div>
     );
   }
@@ -132,7 +143,7 @@ export class FacetBreadcrumbsComponent extends Component<FacetBreadcrumbsProps, 
     return (
       <span>
         {begin}
-        <span className={styles.or}>to</span>
+        <span className={styles.or}> to </span>
         {end}
       </span>
     );

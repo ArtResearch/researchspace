@@ -57,11 +57,21 @@ export interface Actions {
 
   selectFacetValue: (relation: SearchModel.Relation) => (value: FacetValue) => void;
   deselectFacetValue: (relation: SearchModel.Relation) => (value: FacetValue) => void;
+  replaceFacetValue: (relation: SearchModel.Relation) => (oldValue: FacetValue, newValue: FacetValue) => void;
+  /**
+   * Atomically set full selection list for relation (batched update).
+   */
+  setRelationSelections: (relation: SearchModel.Relation) => (values: FacetValue[]) => void;
 
   /**
    * Action which is triggered when user removes all selected facets for relation.
    */
   removeConjunct: (conjunct: SearchModel.RelationConjunct) => void;
+
+  /**
+   * Action which is triggered when user removes all selected facets for all relations. 
+   */
+  removeAllConjuncts: () => void;
 }
 
 export type Conjuncts = Array<FacetRelationConjunct>;
@@ -72,7 +82,7 @@ export type FacetRelationDisjunct =
   | SearchModel.LiteralDisjunct
   | SearchModel.NumericRangeDisjunct;
 
-export type { DateRange, Literal, NumericRange } from '../search/Model';
+export type { DateRange, Literal, NumericRange, Resource } from '../search/Model';
 export type FacetValue = SearchModel.Resource | SearchModel.DateRange | SearchModel.Literal | SearchModel.NumericRange;
 
 /**

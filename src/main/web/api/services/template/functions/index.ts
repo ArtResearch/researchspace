@@ -26,15 +26,17 @@ import { NumbersFunctions } from './NumbersFunctions';
 import { StringsFunctions } from './StringsFunctions';
 import {ResourceConfigurationFunctions} from './ResourceConfigurationFunctions';
 
-export const DefaultHelpers = {
-  ...DataContextFunctions,
-  ...GenericFunctions,
-  ...DateTimeFunctions,
-  ...RdfFunctions,
-  ...UriComponentFunctions,
-  ...NumbersFunctions,
-  ...StringsFunctions,
-  ...ResourceConfigurationFunctions
+export function DefaultHelpers(handlebars) {
+  return {
+    ...DataContextFunctions,
+    ...GenericFunctions(handlebars),
+    ...DateTimeFunctions,
+    ...RdfFunctions,
+    ...UriComponentFunctions,
+    ...NumbersFunctions,
+    ...StringsFunctions,
+    ...ResourceConfigurationFunctions
+  };
 };
 
 export { ContextCapturer, CapturedContext } from './DataContextFunctions';

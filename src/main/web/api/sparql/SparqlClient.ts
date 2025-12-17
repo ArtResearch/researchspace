@@ -22,6 +22,7 @@ import * as Kefir from 'kefir';
 import * as _ from 'lodash';
 import * as SparqlJs from 'sparqljs';
 import * as URI from 'urijs';
+import * as uuid from 'uuid';
 
 import { serializeQuery, parseQuerySync } from './SparqlUtil';
 import { cloneQuery } from './QueryVisitor';
@@ -329,6 +330,7 @@ export function sparqlQueryRequest(params: {
   const header = assign(
     {
       'Content-Type': 'application/sparql-query; charset=utf-8',
+      'X-Cache-Key': uuid.v5(preparedQuery, '931ab69a-7067-4612-b37a-14c34b912bd1'),
     },
     headers
   );
@@ -366,7 +368,7 @@ export function executeSparqlUpdate(
  *
  * @see http://www.w3.org/TR/sparql11-results-json/#select-encode-terms
  */
-function sparqlSelectBindingValueToRdf(binding: SparqlSelectBinding): Rdf.Node {
+export function sparqlSelectBindingValueToRdf(binding: SparqlSelectBinding): Rdf.Node {
   if (binding.type === 'uri') {
     return Rdf.iri(binding.value);
   } else if (binding.type === 'literal') {

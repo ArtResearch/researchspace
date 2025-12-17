@@ -7,6 +7,12 @@
                                  ?managedByResourceConfig
                             
                         WHERE {
+
+                              <{{configOrScheme}}> a <http://www.researchspace.org/resource/system/resource_configuration> .
+                              BIND(<{{configOrScheme}}> as ?refersToResourceConfig_2) .
+
+                            BIND(COALESCE(?refersToResourceConfig_1, ?refersToResourceConfig_2  [[#if defaultConfig]], <[[defaultConfig]]>[[/if]]) AS ?resourceConfiguration ) .
+>>>>>>> 82a5316ce (WIP, re-check qlever)
                             {{#if useCollection}}
                               OPTIONAL {
                                 <{{useCollection}}> crm:P67_refers_to ?refersToResourceConfig .
@@ -25,6 +31,13 @@
                             }
                           
                             BIND(COALESCE(?refersToResourceConfig [[#if defaultConfig]], <[[defaultConfig]]>[[/if]]) AS ?resourceConfiguration ) .
+=======
+
+                              <{{configOrScheme}}> a <http://www.researchspace.org/resource/system/resource_configuration> .
+                              BIND(<{{configOrScheme}}> as ?refersToResourceConfig_2) .
+
+                            BIND(COALESCE(?refersToResourceConfig_1, ?refersToResourceConfig_2  [[#if defaultConfig]], <[[defaultConfig]]>[[/if]]) AS ?resourceConfiguration ) .
+>>>>>>> 82a5316ce (WIP, re-check qlever)
                             BIND(BOUND(?refersToResourceConfig) as ?managedByResourceConfig) .
                             
                             #?resourceConfiguration <http://www.researchspace.org/pattern/system/resource_configuration/resource_name> ?resourceName ;
@@ -179,4 +192,3 @@
         
     </template>
 </semantic-query>
-

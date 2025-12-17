@@ -140,6 +140,8 @@ declare namespace OpenSeadragon {
     navImages?: any;
     showNavigationControl?: boolean;
     debugMode?: boolean;
+    autoResize?: boolean;
+    homeFillsViewer?: boolean;
 	}
 
   type CompositeOperation =

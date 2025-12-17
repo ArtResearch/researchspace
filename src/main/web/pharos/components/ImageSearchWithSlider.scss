@@ -1,0 +1,771 @@
+@import '~basic-styles.scss';
+
+.imageSearchWithSlider {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+  position: relative;
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .domainSelector { 
+    width: 15rem;
+    border-bottom: solid 1.5px black;
+    
+    :global(.dropdown) {
+      width: 100%;
+    }
+
+    :global(.dropdown-toggle) {
+      width: 100%;
+      height: 5rem;
+      font-size: 1.8rem;
+      background-color: #fff9e8;
+      border: solid 1.5px black;
+      border-radius: 2.6rem;
+      transition: 0.2s;
+      font-weight: bold;
+      
+
+      &:focus {
+        background-color: #fff9e8;
+      }
+    }
+
+    :global(.btn .caret) {
+      margin-left: auto;
+    }
+    
+    :global(.dropdown-menu) {
+      width: 100%;
+      background-color: #fff9e8;
+      border: none;
+      border-radius: 0;
+      transition: 0.2s;
+      font-weight: bold;
+
+      :global(> .active > a) {
+        background-color: var(--domain-color);
+      }
+
+      :global(> li > a:hover) {
+        background-color: #23ce9d;
+      }
+    }
+
+    :global(#domain-selector) {
+      border: none;
+    }
+  }
+  
+  .imageSearchContainer {
+    display: flex;
+    align-items: flex-start;
+    flex: 1;
+    gap: 1rem;
+    position: relative;
+    flex-wrap: wrap;
+    min-height: 5rem; // Ensure container has height even when input is hidden
+  }
+
+  .inputDropzoneContainer {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 1rem;
+    position: relative;
+    background-color: #fff9e8;
+    border: solid 1.5px black;
+    border-radius: 2.6rem;
+    padding: 0 1.5rem;
+    box-shadow: 0px 3px 10px 0px rgba(31, 31, 31, 0.08);
+    transition: 0.2s;
+
+    &:focus-within {
+      border: 1.5px solid var(--domain-color);
+      box-shadow: 0 2px 8px 1px rgba(64,60,67,.24);
+    }
+
+    &.inputDisabled {
+      pointer-events: none;
+    }
+  }
+
+  .searchIconLeft {
+    color: $gray;
+    font-size: 2rem;
+    cursor: default;
+    flex-shrink: 0;
+  }
+
+  .inputWithClear {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    :global(.form-control) {
+      padding-right: 3rem;
+      border: none;
+      background-color: transparent;
+      box-shadow: none;
+      height: 5rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+
+      &:focus {
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+      }
+    }
+  }
+
+  .clearTextBtn {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+    color: $gray;
+    font-size: 2rem;
+    z-index: 1;
+
+    &:hover {
+      color: $gray-dark;
+    }
+  }
+
+  .cameraIcon {
+    color: $gray;
+    font-size: 2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      color: $gray-dark;
+    }
+  }
+
+  .searchHelpIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray;
+    font-size: 2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    text-decoration: none;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      color: $gray-dark;
+      text-decoration: none;
+    }
+
+    .material-symbols-rounded {
+      font-size: inherit;
+      color: inherit;
+    }
+  }
+
+  .searchButton {
+    color: white;
+    background-color: var(--domain-color) !important;
+    border-radius: 4px;
+    font-size: 1.8rem !important;
+    font-weight: 500;
+    padding: 1rem 2.4rem;
+    cursor: pointer;
+    border: none;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    height: 5rem;
+    white-space: nowrap;
+    
+    &:hover {
+      filter: brightness(0.9);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(var(--domain-color), 0.3);
+    }
+  }
+
+  .imagePreviewContainer {
+    align-items: center;
+    display: flex;
+    height: 4.8rem;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    box-shadow: 0px 3px 10px 0px rgba(31, 31, 31, 0.08);
+    border-radius: 2.6rem;
+    background-color: #fff9e8;
+    border: solid 1.5px black;
+  }
+
+  .imagePreview {
+    max-height: 3.7rem;
+    max-width: 20rem;
+    object-fit: contain;
+    margin-left: 1.5rem;
+  }
+
+  .clearImageBtn {
+    cursor: pointer;
+    color: $gray;
+    font-size: 2.4rem;
+    padding-right: 1rem;
+
+    &:hover {
+      color: $gray-dark;
+    }
+  }
+
+  .progressContainer {
+    width: 100%;
+  }
+
+  .sliderField {
+    display: flex;
+    flex: 1;
+    padding-right: 0.4rem;
+    margin-right: 2rem;
+    align-items: center;
+    
+    .sliderLabel {
+      margin-right: 1.5rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      white-space: nowrap;
+      color: #202124;
+      line-height: 1;
+    }
+    
+    .sliderFieldSliderContainer {
+      flex: 1;
+    }
+
+    :global(.rc-slider-dot),
+    :global(.rc-slider-handle) {
+      border-color: var(--domain-color);
+    }
+
+    :global(.rc-slider-disabled) {
+      background-color: unset;
+    }
+
+    // Slider mark labels
+    :global(.rc-slider-mark-text) {
+      font-size: 1.2rem;
+      color: $gray;
+    }
+  }
+
+  .searchControls {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    font-size: 1.4rem;
+    margin-top: 10px;
+  }
+
+  .modelTypeGroup {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+  }
+
+  .modelSelection {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+
+    :global(.checkbox) {
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    :global(.checkbox label) {
+      font-size: 0;
+      padding-left: 2.2rem;
+      display: flex;
+      align-items: center;
+      min-height: unset;
+      line-height: 1;
+
+      &::before {
+        width: 1.6rem;
+        height: 1.6rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      &::after {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: #202124;
+        line-height: 1;
+      }
+
+      &[title="Text Match"]::after {
+        content: "Keyword";
+      }
+
+      &[title="Textual Similarity"]::after {
+        content: "Conceptual";
+      }
+
+      &[title="Visual Similarity"]::after {
+        content: "Visual";
+      }
+
+      &[title="Visual Match"]::after {
+        content: "Exact";
+      }
+    }
+  }
+
+  .modelRow {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .aiToggle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    label {
+      margin: 0;
+      font-weight: bold;
+    }
+  }
+}
+
+// Image Search In-Place Overlay Styles
+.imageSearchOverlayWrapper {
+  position: absolute;
+  z-index: 1000;
+  // Position and width will be set dynamically via JavaScript
+  // Default values for initial render
+  left: 0;
+  width: 100%;
+  min-width: 50rem;
+  max-width: 60rem;
+  
+  // Animation for opening
+  animation: overlayFadeIn 0.15s ease-out;
+}
+
+// Position modifier classes
+.overlayPositionDown {
+  // Overlay opens below the input, covering it and extending down
+  .imageSearchOverlay {
+    // Top of overlay aligns with input, so round top corners but not where it meets input
+    border-top-left-radius: 2.6rem;
+    border-top-right-radius: 2.6rem;
+  }
+  
+  .imageSearchOverlayHeader {
+    // Header at top - border on bottom
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: none;
+    // Match the input height so close X aligns with camera icon position
+    min-height: 5rem;
+    padding: 0 1.5rem;
+  }
+}
+
+.overlayPositionUp {
+  // Overlay opens above the input, covering it and extending up
+  .imageSearchOverlay {
+    border-bottom-left-radius: 2.6rem;
+    border-bottom-right-radius: 2.6rem;
+  }
+  
+  .imageSearchOverlayHeader {
+    // Header at bottom - border on top
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+    // Match the input height so close X aligns with camera icon position
+    min-height: 5rem;
+    padding: 0 1.5rem;
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.imageSearchOverlay {
+  background-color: #fff9e8;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.imageSearchOverlayBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 249, 232, 0.5);
+  z-index: 999;
+}
+
+.imageSearchOverlayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  min-height: 5rem; // Match input height
+  background-color: rgba(255, 255, 255, 0.5);
+  // Border is set by position modifier classes
+}
+
+.imageSearchOverlayTitle {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #202124;
+}
+
+.imageSearchOverlayClose {
+  cursor: pointer;
+  color: $gray;
+  font-size: 2.4rem;
+  padding: 0.4rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: $gray-dark;
+  }
+}
+
+.imageSearchOverlayBody {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  background-color: #fff9e8;
+}
+
+.imageSearchDropzone {
+  min-height: 18rem;
+  border: 2px dashed rgba(0, 0, 0, 0.2) !important;
+  border-radius: 0.8rem;
+  padding: 3rem 2rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  /* Style for when file is dragged over the dropzone */
+  &:global(.drag-accept) {
+    border-color: var(--domain-color) !important;
+    border-style: solid !important;
+    background-color: rgba(var(--domain-color), 0.1) !important;
+    box-shadow: 0 0 15px rgba(var(--domain-color), 0.3);
+    transform: scale(1.01);
+  }
+  
+  /* Override global dropzone-area styles */
+  &:global(.dropzone-area) {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border: 2px dashed rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+.imageSearchDropzoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.imageSearchDropzoneIcon {
+  font-size: 5.4rem;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.imageSearchDropzoneText {
+  font-size: 1.8rem;
+  color: #202124;
+  font-weight: 400;
+
+  a {
+    color: var(--domain-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.imageSearchDropzoneFormats {
+  font-size: 1.8rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  margin-top: 0.8rem;
+}
+
+.imageSearchModalOr {
+  text-align: center;
+  color: $gray;
+  font-size: 1.4rem;
+  font-weight: 500;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background-color: $gray-light;
+  }
+
+  &::before {
+    left: 0;
+  }
+
+  &::after {
+    right: 0;
+  }
+}
+
+.imageSearchUrlContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  :global(.form-control) {
+    flex: 1;
+    height: 5rem;
+    background-color: #fff9e8;
+    border: solid 1.5px black;
+    border-radius: 2.6rem;
+    padding: 0 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    box-shadow: 0px 3px 10px 0px rgba(31, 31, 31, 0.08);
+    transition: 0.2s;
+
+    &:focus {
+      border: 1.5px solid var(--domain-color);
+      box-shadow: 0 2px 8px 1px rgba(64,60,67,.24);
+      outline: none;
+      background-color: #fff9e8;
+    }
+
+    &::placeholder {
+      font-weight: normal;
+      color: $gray;
+    }
+  }
+}
+
+.imageSearchModalSearchBtn {
+  color: white;
+  background-color: var(--domain-color) !important;
+  border-radius: 4px;
+  // need to override font size from bootstrap button media queries
+  font-size: 1.8rem !important;
+  font-weight: 500;
+  padding: 1rem 2.4rem;
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  height: 5rem;
+  white-space: nowrap;
+  
+  &:hover {
+    filter: brightness(0.9);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--domain-color), 0.3);
+  }
+}
+
+.helpPopover {
+  transform: translateX(-50%) translateX(0.7rem);
+  
+  :global(.popover-content) {
+    padding: 0.5rem;
+    font-size: 1.4rem;
+  }
+}
+
+.helpIcon {
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: $gray-light;
+
+  &:hover {
+    color: $gray;
+  }
+}
+
+/* Media queries */
+@container (width < 767px) {
+  .imageSearchWithSlider {
+    flex-direction: column;
+
+    .topRow {
+      flex-direction: column;
+      align-items: stretch; /* Make items take full width */
+    }
+
+    .domainSelector {
+      margin-right: 0;
+      width: 100%;
+    }
+
+
+    .cameraIcon {
+      font-size: 1.8rem;
+    }
+
+    .searchHelpIcon {
+      font-size: 1.8rem;
+    }
+
+    .searchIconLeft {
+      font-size: 1.8rem;
+    }
+
+    .imageSearchOverlayWrapper {
+      // Position will be set by JavaScript to align with input
+      // On very small screens, ensure it doesn't overflow
+      max-width: calc(100vw - 2rem) !important;
+      z-index: 1001;
+    }
+
+    .imageSearchOverlay {
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+
+    .imageSearchOverlayHeader {
+      // Match input container padding on small screens (padding: 0 1rem)
+      padding: 0 1rem;
+    }
+
+    .imageSearchOverlayTitle {
+      font-size: 1.8rem;
+    }
+
+    .imageSearchOverlayClose {
+      // Match camera icon size on small screens
+      font-size: 1.8rem;
+    }
+
+    .imageSearchOverlayBody {
+      padding: 2rem;
+      gap: 1.6rem;
+    }
+
+    .imageSearchDropzone {
+      min-height: 15rem;
+      padding: 3rem 1.5rem;
+    }
+
+    .imageSearchOverlayBackdrop {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .searchControls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .modelSelection {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .sliderField {
+      flex-direction: row;
+      align-items: center;
+      margin-right: 0;
+
+      .sliderLabel {
+        display: none;
+      }
+
+      .sliderFieldSliderContainer {
+        width: 100%;
+        padding: 0 0.8rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .imageSearchWithSlider {
+    .domainSelector {
+      margin-bottom: 0.5rem;
+
+      :global(.dropdown-toggle) {
+        height: 3rem;
+      }
+    }
+
+    .modelRow {
+      :global(.checkbox) {
+        margin-bottom: 0;
+      }
+    }
+
+    .imageSearchModalSearchBtn, .searchButton {
+      display: none;
+    }
+  }
+}

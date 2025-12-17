@@ -33,5 +33,19 @@ export const StringsFunctions = {
       separator = ' ';
     }
     return text.split(separator);
+  },
+
+  escapeForJson: function(text: string) {
+    if (typeof text !== 'string') {
+      return '';
+    }
+    return text.replace(/"/g, '\\"');
+  },
+
+  contains: function(text: string, otherText: string) {
+    if (typeof text !== 'string' || typeof otherText !== 'string') {
+      return false;
+    }
+    return text.indexOf(otherText) > -1;
   }
 };

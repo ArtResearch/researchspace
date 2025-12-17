@@ -75,7 +75,6 @@ def npmExecutable() {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-
 clean {
     delete "${projectDir}/src/main/webpapp/assets"
     delete "${projectDir}/node_modules"
@@ -94,7 +93,7 @@ eclipse {
     jdt {
         file {
             withProperties { properties ->
-                properties.putAll(eclipseJdtProps)
+                properties.putAll(eclipseJdtProps) 
             }
         }
     }
@@ -200,7 +199,7 @@ gretty {
     fastReload = "${projectDir.getAbsolutePath()}/src/main/resources/org/researchspace/apps".toString()
 
     // use custom jetty-env.xml to disable websocket support
-    contextConfigFile = "${projectDir}/jetty-env.xml"
+//    contextConfigFile = "${projectDir}/jetty-env.xml"
 
     recompileOnSourceChange = false
 
@@ -333,6 +332,7 @@ task runWiremock(type: JavaExec) {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 
     // for digilib war
     maven { url 'https://robcast.github.io/digilib-repo/maven-repo' }
@@ -351,7 +351,7 @@ ext {
     JACKSON_VERSION = '2.10.3'
     GUICE_VERSION = '6.0.0'
     SHIRO_VERSION = '2.0.2'
-    IMAGEIO_VERSION = '3.5'
+    IMAGEIO_VERSION = '3.12.0'
 }
 
 configurations.all {
@@ -360,6 +360,12 @@ configurations.all {
 
     // excludes xml.bind-api from javax we already have jakarta one in the classpath
     exclude group: 'javax.xml.bind', module: 'jaxb-api'
+}
+
+configurations.all {
+  resolutionStrategy{
+    cacheChangingModulesFor 0, 'seconds'
+  }
 }
 
 dependencies {
@@ -372,7 +378,9 @@ dependencies {
 
         // add jetty as compile dependency so we get sources and javadocs and can debug it locally
         "org.eclipse.jetty:jetty-server:${jetty94_version}",
-        "org.eclipse.jetty:jetty-servlet:${jetty94_version}"
+        "org.eclipse.jetty:jetty-servlet:${jetty94_version}",
+        "org.eclipse.jetty.websocket:websocket-server:${jetty94_version}",
+        "org.eclipse.jetty.websocket:websocket-servlet:${jetty94_version}"
     )
 
     api (
@@ -430,6 +438,9 @@ dependencies {
         "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:${JACKSON_VERSION}",
         "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${JACKSON_VERSION}",
 
+        // Jackson, for YAML
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}",
+
         // Google Guice, for dependency injection
         "com.google.inject:guice:${GUICE_VERSION}",
         "com.google.inject.extensions:guice-servlet:${GUICE_VERSION}",
@@ -448,7 +459,7 @@ dependencies {
         "org.apache.commons:commons-lang3:3.10",
 
         // configuration
-        "org.apache.commons:commons-configuration2:2.7",
+        "org.apache.commons:commons-configuration2:2.11.0",
         "commons-beanutils:commons-beanutils:1.9.4",
 
         //guava
@@ -486,8 +497,9 @@ dependencies {
         "org.eclipse.jgit:org.eclipse.jgit.ssh.apache:5.13.1.202206130422-r",
 
         "com.twelvemonkeys.imageio:imageio-tiff:${IMAGEIO_VERSION}",
-        "com.twelvemonkeys.imageio:imageio-core:${IMAGEIO_VERSION}",
-    ) 
+        "com.twelvemonkeys.imageio:imageio-jpeg:${IMAGEIO_VERSION}",
+        "com.twelvemonkeys.imageio:imageio-core:${IMAGEIO_VERSION}"
+    )
     testImplementation (
         "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-inmemory:${JERSEY_VERSION}",
         "org.hamcrest:hamcrest-library:1.3",

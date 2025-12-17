@@ -33,6 +33,7 @@ import { trigger } from 'platform/api/events';
 import { SparqlUtil, SparqlClient } from 'platform/api/sparql';
 import * as LabelsService from 'platform/api/services/resource-label';
 import { Component } from 'platform/api/components';
+import { TemplateItem } from 'platform/components/ui/template';
 import { ErrorNotification } from 'platform/components/ui/notification';
 import { ClearableInput, ClearableInputProps, RemovableBadge } from 'platform/components/ui/inputs';
 import { Spinner } from 'platform/components/ui/spinner';
@@ -49,6 +50,8 @@ import { navigateToResource } from 'platform/api/navigation';
 
 import * as styles from './SemanticTreeInput.scss';
 import {SelectLabel, SelectLabelProps} from "platform/components/ui/inputs/SelectLabel";
+
+import { defaultKeywordSearchConfig, KeywordSearchConfig, textConfirmsToConfig } from "platform/components/shared/KeywordSearchConfig";
 
 import Icon from 'platform/components/ui/icon/Icon';
 import { ConfigHolder } from 'platform/api/services/config-holder';
@@ -79,13 +82,26 @@ export interface ComplexTreePatterns {
    * Search query with [?__token__] input and [?item, ?score, ?label, ?hasChildren] outputs.
    */
   searchQuery: string;
+
+
+  /**
+   * Use label service to fetch labels for nodes.
+   *
+   * @default false
+   */
+  useLabelService?: boolean;
 }
 
-export interface SemanticTreeInputProps extends ComplexTreePatterns {
+export interface SemanticTreeInputProps extends ComplexTreePatterns, KeywordSearchConfig {
   /**
    * Optional custom class for the tree.
    */
   className?: string;
+
+  /**
+   * Template for node additional info.
+   */
+  infoTemplate?: string;
 
   /**
    * This component is an uncontrolled component, but this property can be used to specify
@@ -136,7 +152,6 @@ interface SelectedItem {
 }
 
 const ITEMS_LIMIT = 200;
-const MIN_SEARCH_TERM_LENGTH = 3;
 const SEARCH_DELAY_MS = 300;
 
 interface State {
@@ -238,6 +253,10 @@ interface SearchResult {
  * '></semantic-tree-input>
  */
 export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> {
+  static defaultProps: Partial<SemanticTreeInputProps> = {
+    ...defaultKeywordSearchConfig
+  };
+
   private readonly cancellation = new Cancellation();
   private search = this.cancellation.derive();
 
@@ -336,6 +355,7 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
         parentsQuery: SparqlUtil.parseQuerySync<SparqlJs.SelectQuery>(props.parentsQuery),
         limit: ITEMS_LIMIT,
         sparqlOptions: () => ({ context: this.context.semanticContext }),
+        useLabelService: true
       });
       const searchQuery = SparqlUtil.parseQuerySync<SparqlJs.SelectQuery>(props.searchQuery);
       return { model, searchQuery };
@@ -575,7 +595,7 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
 
   private searchFor(text: string, force: boolean) {
     const doForceSearch = this.props.allowForceSuggestion && force;
-    const hasEnoughSearchText = doForceSearch || text.length >= MIN_SEARCH_TERM_LENGTH;
+    const hasEnoughSearchText = doForceSearch || textConfirmsToConfig(text, this.props);
 
     if (hasEnoughSearchText) {
       const searchingSameText = this.state.searching && this.state.searchText === text;
@@ -624,11 +644,16 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
   }
 
   private performSearch(text: string) {
+    const { 
+      tokenizeLuceneQuery, escapeLuceneSyntax, minSearchTermLength, minTokenLength
+     } = this.props;
     const parametrized = SparqlClient.setBindings(this.state.searchQuery, {
-      __token__: SparqlUtil.makeLuceneQuery(text),
+      __token__: SparqlUtil.makeLuceneQuery(
+        text, tokenizeLuceneQuery, escapeLuceneSyntax, minTokenLength
+      ),
     });
     return Kefir.later(SEARCH_DELAY_MS, {})
-      .flatMap<SparqlClient.SparqlSelectResult>(() => SparqlClient.select(parametrized))
+      .flatMap<SparqlClient.SparqlSelectResult>(() => SparqlClient.select(parametrized, { context: this.context.semanticContext }))
       .flatMap<SearchResult>((result) =>
         this.restoreTreeFromLeafNodes(result.results.bindings).map((forest) => ({
           forest,
@@ -747,12 +772,12 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
   private renderDropdownContent(mode: ExpandedMode): ReactElement<any> {
     if (mode.type === 'search') {
       if (
-        this.state.searchText && this.state.searchText.length < MIN_SEARCH_TERM_LENGTH &&
+        this.state.searchText && this.state.searchText.length < this.props.minSearchTermLength &&
         (!this.state.searchForce || !this.props.allowForceSuggestion)
       ) {
         return D.span(
           { className: styles.searchMessage },
-          `Minimum length of search term is ${MIN_SEARCH_TERM_LENGTH} characters`
+          `Minimum length of search term is ${this.props.minSearchTermLength} characters`
         );
       } else if (this.state.searching) {
         return createElement(Spinner, { className: styles.searchSpinner });
@@ -920,9 +945,19 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
         title: node.iri.value,
         className: node.error ? styles.error : undefined,
       },
-      ...parts
+      ...parts,
+      this.renderNodeInfoTemplate(node)
     );
   }
+
+  private renderNodeInfoTemplate(node: Node) {
+    if (this.props.infoTemplate) {
+      return createElement(TemplateItem, {template: {source: this.props.infoTemplate, options: {iri: node.iri.value, label: node.label.value, binding: node.tuple}}});
+    } else {
+      return null;
+    }
+  }
+
 
   private requestChildren(path: KeyPath, isSearching: boolean) {
     let changePromise: ForestChange<Node>;
@@ -947,27 +982,36 @@ export class SemanticTreeInput extends Component<SemanticTreeInputProps, State> 
   private restoreTreeFromLeafNodes(searchResult: SparqlClient.Bindings): Kefir.Property<KeyedForest<Node>> {
     const leafs = searchResult
       .map(
-        ({ item, score = Rdf.literal('0'), label, hasChildren }): Node => {
-          if (!(item.isIri() && label.isLiteral())) {
+        (binding): Partial<Node> => {
+          const { item, score = Rdf.literal('0'), hasChildren } = binding;
+          if (!item.isIri()) {
             return undefined;
           }
           const certainlyLeaf = hasChildren.isLiteral() && hasChildren.value === 'false';
           return {
             iri: item,
-            label: label,
+            tuple: binding,
             score: parseFloat(score.isLiteral() ? score.value : ''),
             children: [],
             reachedLimit: certainlyLeaf,
           };
         }
       )
-      .filter((node) => node !== undefined);
-
-    return this.state.model
-      .loadFromLeafs(leafs, { transitiveReduction: true })
-      .map((treeRoot) => KeyedForest.create(Node.keyOf, sealLazyExpanding(treeRoot)));
-  }
-}
+      .filter((node): node is Partial<Node> => node !== undefined);
+  
+    return LabelsService.getLabels(leafs.map(node => node.iri), { context: this.context.semanticContext })
+      .flatMap(labels => {
+        const nodesWithLabels = leafs.map(node => ({
+          ...node,
+          label: labels.has(node.iri) ? Rdf.literal(labels.get(node.iri)) : undefined,
+        }));
+  
+        return this.state.model
+          .loadFromLeafs(nodesWithLabels as Node[], { transitiveReduction: true })
+          .map((treeRoot) => KeyedForest.create(Node.keyOf, sealLazyExpanding(treeRoot)));
+      })
+      .toProperty();
+  }}
 
 class OverlayProxy extends Component<{}, {}> {
   render() {
