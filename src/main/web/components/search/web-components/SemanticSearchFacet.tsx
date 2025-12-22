@@ -104,8 +104,7 @@ class SemanticSearchFacetInner extends React.Component<InnerProps, State> {
       .getOrElse(false);
     const canUpdateFacets =
       nextContext.baseQuery.isJust &&
-      nextContext.domain.isJust &&
-      (nextContext.resultsStatus.loaded || hasInitialFacets);
+      nextContext.domain.isJust;
     const isNewDomain = context.domain
       .chain((currentDomain) => nextContext.domain.map((newDomain) => ({ currentDomain, newDomain })))
       .map(({ currentDomain, newDomain }) => !currentDomain.iri.equals(newDomain.iri))
