@@ -109,11 +109,17 @@ export class MainAppComponent extends Component<
    */
   private updatePageTitle(isSparqlEndpoint: boolean) {
     if (isSparqlEndpoint) {
-      document.title = `SPARQL Endpoint [${BASE_TITLE}]`;
+      document.title = `SPARQL Endpoint`;
     } else {
       try {
         getLabel(getCurrentResource())
-          .onValue((label) => (document.title = `${label} [${BASE_TITLE}]`))
+          .onValue((label) => {
+            if (label === "start") {
+              (document.title = `${BASE_TITLE}`)
+            } else {
+              (document.title = `${label}`)
+            }
+          })
           .onError((e) => {
             document.title = BASE_TITLE;
             console.error(e);
